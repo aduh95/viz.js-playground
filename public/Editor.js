@@ -15,8 +15,8 @@ class Editor extends Component {
     loadingPreview.textContent = "Loading…";
     this.elementRef.current.append(loadingPreview);
 
-    if (typeof PRERENDER === "undefined") {
-      import("./ace.js")
+    if (!this.props.prerender) {
+      import("./ace.bundle.js")
         .then((ace) => {
           loadingPreview.remove();
 

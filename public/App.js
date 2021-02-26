@@ -7,18 +7,19 @@ const STORAGE_ENTRY = "viz.js";
 const defaultSrc = "digraph { 1 -> 2 }";
 
 let beforeUnloadMessage = null;
-
-window.addEventListener("beforeunload", function (e) {
+function beforeUnload() {
   return beforeUnloadMessage;
-});
+}
 
-class App extends Component {
+export default class App extends Component {
   state = {
     src:
       this.getHashDiagram() ||
       localStorage.getItem(STORAGE_ENTRY) ||
       defaultSrc,
-    isDark: matchMedia("(prefers-color-scheme: dark)").matches,
+    isDark:
+      this.props.prerender ||
+      matchMedia("(prefers-color-scheme: dark)").matches,
   };
 
   handleOptionChange = this.handleOptionChange.bind(this);
@@ -34,6 +35,7 @@ class App extends Component {
   }
 
   getHashDiagram() {
+    if (this.props.prerender) return defaultSrc;
     return decodeURI(location.hash.replace(/^#/, ""));
   }
 
@@ -55,10 +57,14 @@ class App extends Component {
   }
 
   componentDidMount() {
+    if (!this.props.prerender) {
+      addEventListener("beforeunload", beforeUnload);
+    }
     addEventListener("hashchange", this.hashChangeListener);
   }
   componentWillUnmount() {
     removeEventListener("hashchange", this.hashChangeListener);
+    removeEventListener("beforeunload", beforeUnload);
   }
 
   render() {
@@ -96,16 +102,19 @@ class App extends Component {
           value={this.state.src}
           onChange={this.handleAceEditorChange}
           isDark={this.state.isDark}
+          prerender={this.props.prerender}
         />
 
         <Options
           isDark={this.state.isDark}
           onOptionChange={this.handleOptionChange}
         />
-        <Graph src={this.state.src} isDark={this.state.isDark} />
+        <Graph
+          src={this.state.src}
+          isDark={this.state.isDark}
+          prerender={this.props.prerender}
+        />
       </div>
     );
   }
 }
-
-export default App;

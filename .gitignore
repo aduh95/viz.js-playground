@@ -1,5 +1,8 @@
 /node_modules
 /dist
+public/ace.bundle.js
+
+.cache
 
 npm-debug.log*
 yarn-debug.log*

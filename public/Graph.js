@@ -16,7 +16,7 @@ class Graph extends Component {
     const { src, isDark } = this.props;
 
     // If the input is empty (or only whitespace) (or during prerendering), render nothing.
-    if (!src.match(/\S+/) || typeof PRERENDER !== "undefined") {
+    if (!src.match(/\S+/) || this.props.prerender) {
       this.setState({ element: null, error: null });
       return;
     }
